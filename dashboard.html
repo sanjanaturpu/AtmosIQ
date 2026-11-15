@@ -1,0 +1,376 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AtmosIQ | India Climate Dashboard</title>
+
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌐</text></svg>">
+
+    <link rel="stylesheet" href="style.css">
+
+    <link rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        defer></script>
+
+    <script src="https://cdn.plot.ly/plotly-3.0.1.min.js"></script>
+
+    <script src="script.js" defer></script>
+</head>
+
+<body>
+
+<div class="dashboard">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <a href="index.html" class="brand">
+            <span class="brand-icon" aria-hidden="true">🌐</span>
+            <div>
+                <h2>Atmos<span class="logo-highlight">IQ</span></h2>
+                <small>CLIMATE INTELLIGENCE</small>
+            </div>
+        </a>
+
+        <a href="index.html" class="sidebar-home-link"><span class="home-arrow">←</span><span>Back to Home</span></a>
+
+        <nav class="side-nav">
+            <a href="#" class="side-link active" data-view="states"><span class="nav-icon">📍</span><span>Regional Analysis</span></a>
+            <a href="#" class="side-link" data-view="temperature"><span class="nav-icon">🌡️</span><span>Temperature</span></a>
+            <a href="#" class="side-link" data-view="rainfall"><span class="nav-icon">🌧️</span><span>Precipitation</span></a>
+            <a href="#" class="side-link" data-view="insights"><span class="nav-icon">✨</span><span>Climate Insights</span></a>
+            <a href="#" class="side-link" data-view="methodology"><span class="nav-icon">📊</span><span>Data &amp; Methodology</span></a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <p>AtmosIQ v1.0</p>
+        </div>
+
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main-area">
+
+        <header class="topbar">
+
+            <div>
+                <h1 id="view-title">Regional Analysis</h1>
+            </div>
+
+        </header>
+
+        <!-- MAP SECTION -->
+        <section class="map-layout">
+
+            <div class="map-container">
+
+                <div class="map-heading">
+                    <div>
+                        <h2>India Regional Explorer</h2>
+                        <p>Select a state to explore its climate patterns</p>
+                    </div>
+
+                    <div class="map-heading-actions">
+                    <button type="button" id="back-to-world" class="map-nav-button">← Back to World</button>
+                    <label class="overlay-control">CLIMATE OVERLAY
+                        <select id="climate-overlay-variable" aria-label="Climate map overlay">
+                            <option value="temperature">Temperature</option>
+                            <option value="rainfall">Precipitation</option>
+                        </select>
+                    </label>
+                    </div>
+                </div>
+
+                <div id="climate-map"></div>
+
+                <div class="map-legend">
+                    <span id="overlay-legend-title">Mean annual temperature (°C)</span>
+                    <span class="legend-note">Lower <span class="legend-gradient"></span> Higher</span>
+                </div>
+
+            </div>
+
+            <!-- RIGHT PANEL -->
+            <aside class="info-panel">
+
+                <label class="rainfall-select-wrap map-region-select" for="rainfall-state">
+                    <span>SELECT REGION</span>
+                    <select id="rainfall-state" aria-label="Select Indian state or territory">
+                        <option value="IN-KL">Loading regions...</option>
+                    </select>
+                </label>
+
+                <div class="info-heading">
+                    <div>
+                        <p>GEOGRAPHICAL ANALYSIS</p>
+                        <h2 id="selected-place">India</h2>
+                    </div>
+                    <span>🌍</span>
+                </div>
+
+                <div class="selection-card">
+                    <small>SELECTED LOCATION</small>
+                    <h3 id="location-name">Indian States</h3>
+                    <p id="location-description">
+                        Select a state on the map or from the region selector.
+                    </p>
+                </div>
+
+                <div class="info-stat">
+                    <div>
+                        <small>AVERAGE TEMPERATURE</small>
+                        <h3 id="temperature-value">-- °C</h3>
+                    </div>
+                    <span>🌡️</span>
+                </div>
+
+                <div class="info-stat">
+                    <div>
+                        <small>PRECIPITATION</small>
+                        <h3 id="rainfall-value">-- mm</h3>
+                    </div>
+                    <span>🌧️</span>
+                </div>
+
+                
+
+            </aside>
+
+        </section>
+
+        <!-- RAINFALL ANALYSIS -->
+        <section class="analysis-section" id="rainfall-analysis" hidden>
+            <div class="rainfall-summary" aria-live="polite">
+                <article class="rainfall-summary-card">
+                    <span>34-YEAR AVERAGE</span>
+                    <strong id="rainfall-average">--</strong>
+                    <small>mm per year</small>
+                </article>
+                <article class="rainfall-summary-card">
+                    <span>HIGHEST YEAR</span>
+                    <strong id="rainfall-maximum">--</strong>
+                    <small id="rainfall-maximum-year">Annual total</small>
+                </article>
+                <article class="rainfall-summary-card">
+                    <span>LOWEST YEAR</span>
+                    <strong id="rainfall-minimum">--</strong>
+                    <small id="rainfall-minimum-year">Annual total</small>
+                </article>
+                <article class="rainfall-summary-card">
+                    <span>DATA COVERAGE</span>
+                    <strong id="rainfall-years">--</strong>
+                    <small>valid years out of 34</small>
+                </article>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-card-heading">
+                    <div>
+                        <h3 id="rainfall-chart-title">Kerala annual rainfall</h3>
+                        <p>Area-weighted annual rainfall · millimetres (mm)</p>
+                    </div>
+                    <span class="chart-unit">1991–2024</span>
+                </div>
+                <div id="rainfall-chart" role="img" aria-label="Interactive annual rainfall chart"></div>
+                <p class="chart-footnote" id="rainfall-chart-note">Hover over a point to inspect its annual rainfall. The dashed line shows the 1991–2024 average.</p>
+            </div>
+
+            <div class="chart-card regional-chart-card">
+                <div class="chart-card-heading"><div><h3 id="regional-temperature-title">Selected state annual temperature</h3><p>Area-weighted annual mean temperature (°C).</p></div><span class="chart-unit">1991–2024</span></div>
+                <div id="regional-temperature-chart" role="img" aria-label="Selected state annual temperature trend"></div>
+                <p class="chart-footnote" id="regional-temperature-note">Select a state to view its annual temperature trend.</p>
+            </div>
+        </section>
+
+        <!-- TEMPERATURE ANALYSIS -->
+        <section class="analysis-section temperature-section" id="temperature-analysis" hidden>
+
+            <div class="comparison-card temperature-comparison-card state-temperature-comparison-card">
+                <div class="chart-card-heading">
+                    <div>
+                        <h3>State Temperature Comparison</h3>
+                        <p>Compare annual average, maximum and minimum temperatures across Indian states and union territories (1991–2024).</p>
+                    </div>
+                    <span class="chart-unit">°C · annual</span>
+                </div>
+                <div class="comparison-controls temperature-comparison-controls">
+                    <div class="comparison-controls-heading">
+                        <strong>Choose up to 4 regions</strong>
+                        <span id="temperature-comparison-count">0 of 4 selected</span>
+                    </div>
+                    <div id="temperature-comparison-options" class="comparison-options" aria-label="Choose regions to compare"></div>
+                    <label class="temperature-measure-control">Temperature measure
+                        <select id="temperature-compare-variable">
+                            <option value="tmean_mean_c">Average temperature</option>
+                            <option value="tmax_mean_c">Maximum temperature</option>
+                            <option value="tmin_mean_c">Minimum temperature</option>
+                        </select>
+                    </label>
+                </div>
+                <div class="comparison-chart-wrap temperature-comparison-chart-wrap">
+                    <div id="temperature-state-comparison-chart" class="temperature-chart" role="img" aria-label="Annual temperature comparison across selected Indian states"></div>
+                    <p id="temperature-comparison-status" class="comparison-status" aria-live="polite"></p>
+                </div>
+            </div>
+
+<div class="chart-card temperature-chart-card">
+                <div class="chart-card-heading">
+                    <div>
+                        <h3>Average Annual Temperature</h3>
+                        <p>Annual mean of average surface air temperature (tas).</p>
+                    </div>
+                    <span class="chart-unit">tas · °C</span>
+                </div>
+                <div id="india-temperature-average" class="temperature-chart" role="img" aria-label="Annual average surface air temperature trend"></div>
+            </div>
+
+            <div class="chart-card temperature-chart-card">
+                <div class="chart-card-heading">
+                    <div>
+                        <h3>Maximum Annual Temperature</h3>
+                        <p>Annual mean of daily maximum surface air temperature (tasmax).</p>
+                    </div>
+                    <span class="chart-unit">tasmax · °C</span>
+                </div>
+                <div id="india-temperature-maximum" class="temperature-chart" role="img" aria-label="Annual maximum surface air temperature trend"></div>
+            </div>
+
+            <div class="chart-card temperature-chart-card">
+                <div class="chart-card-heading">
+                    <div>
+                        <h3>Minimum Annual Temperature</h3>
+                        <p>Annual mean of daily minimum surface air temperature (tasmin).</p>
+                    </div>
+                    <span class="chart-unit">tasmin · °C</span>
+                </div>
+                <div id="india-temperature-minimum" class="temperature-chart" role="img" aria-label="Annual minimum surface air temperature trend"></div>
+            </div>
+            <!-- State temperature comparison is part of Indian States analysis -->
+                        <div class="chart-card temperature-chart-card">
+                <div class="chart-card-heading"><div><h3>Historical Climate Heatmap</h3><p>Annual mean temperature by state and year.</p></div><span class="chart-unit">°C · 1991–2024</span></div>
+                <div id="temperature-state-heatmap" class="temperature-chart" role="img" aria-label="Historical annual mean temperature heatmap by state"></div>
+                <p class="chart-footnote">Blank cells indicate missing observations. State values use area-weighted annual means.</p>
+            </div>
+        </section>
+
+        <!-- INDIA-WIDE PRECIPITATION ANALYSIS -->
+        <section class="analysis-section precipitation-section" id="precipitation-analysis" hidden>
+
+            <div class="rainfall-summary precipitation-summary" aria-live="polite">
+                <article class="rainfall-summary-card">
+                    <span>34-YEAR GRID AVERAGE</span>
+                    <strong id="india-rainfall-average">--</strong>
+                    <small>area-weighted mm per year</small>
+                </article>
+                <article class="rainfall-summary-card">
+                    <span>WETTEST YEAR</span>
+                    <strong id="india-rainfall-wettest">--</strong>
+                    <small id="india-rainfall-wettest-year">Annual grid average</small>
+                </article>
+                <article class="rainfall-summary-card">
+                    <span>DRIEST YEAR</span>
+                    <strong id="india-rainfall-driest">--</strong>
+                    <small id="india-rainfall-driest-year">Annual grid average</small>
+                </article>
+                <article class="rainfall-summary-card">
+                    <span>GRID COVERAGE</span>
+                    <strong id="india-rainfall-cells">--</strong>
+                    <small>valid grid cells per year</small>
+                </article>
+            </div>
+
+            <div class="comparison-section">
+<div class="comparison-card">
+                    <div class="chart-card-heading"><div><h3>Compare States</h3><p>Compare annual rainfall trends for up to four states or territories.</p></div><span class="chart-unit">1991–2024</span></div>
+                    <div class="comparison-controls">
+                        <div class="comparison-controls-heading">
+                            <strong>Choose up to 4 regions</strong>
+                            <span id="comparison-count">0 of 4 selected</span>
+                        </div>
+                        <div id="comparison-options" class="comparison-options" aria-label="Choose regions to compare">
+                            <p class="comparison-loading">Loading available regions…</p>
+                        </div>
+                    </div>
+                    <div class="comparison-chart-wrap">
+                        <div id="rainfall-comparison-chart" role="img" aria-label="Annual rainfall comparison chart for selected Indian states"></div>
+                        <p class="chart-footnote" id="comparison-note">Select at least two regions to compare their annual rainfall.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ranking-section">
+<div class="chart-card ranking-card">
+                    <div class="chart-card-heading"><div><h3>Rainfall Rankings</h3><p>States ranked by average annual rainfall across 1991–2024.</p></div><span class="chart-unit">mm / year</span></div>
+                    <div id="rainfall-ranking-chart" role="img" aria-label="Indian states ranked by average annual rainfall"></div>
+                    <p class="chart-footnote" id="ranking-note">Ranking uses the available annual observations for each region. Territories without data are excluded.</p>
+                </div>
+            </div>
+
+            <div class="chart-card precipitation-chart-card">
+                <div class="chart-card-heading">
+                    <div>
+                        <h3>Annual Rainfall Trend Across India</h3>
+                        <p>Area-weighted mean of valid grid-cell annual rainfall values.</p>
+                    </div>
+                    <span class="chart-unit">34 years</span>
+                </div>
+                <div id="india-precipitation-trend" role="img" aria-label="Area-weighted annual rainfall trend across India from 1991 to 2024"></div>
+                <p class="chart-footnote">This is a grid-based spatial average, weighted by grid-cell coverage and latitude-adjusted cell area. It is not a simple average of state averages.</p>
+            </div>
+
+            <div class="chart-card precipitation-chart-card precipitation-map-card">
+                <div class="chart-card-heading">
+                    <div>
+                        <h3>Mean Annual Rainfall Distribution</h3>
+                        <p>Average annual rainfall at each valid grid cell across 1991–2024.</p>
+                    </div>
+                    <span class="chart-unit">mm/year</span>
+                </div>
+                <div id="india-precipitation-heatmap" role="img" aria-label="Grid map of mean annual rainfall across India"></div>
+                <p class="chart-footnote">Each grid cell is shown only where all 34 annual observations are available. This view represents the downloaded India-region grid, not a complete global precipitation map.</p>
+            </div>
+            <div class="chart-card precipitation-chart-card">
+                <div class="chart-card-heading"><div><h3>State Rainfall Distribution</h3><p>States grouped into rainfall quartiles using their 1991–2024 mean annual rainfall.</p></div><span class="chart-unit">States</span></div>
+                <div id="rainfall-distribution-pie" class="precipitation-pie-chart" role="img" aria-label="Pie chart of states grouped by mean annual rainfall quartile"></div>
+                <p class="chart-footnote">Quartile boundaries are calculated from available state-level rainfall averages. Regions without valid data are excluded.</p>
+            </div>
+        </section>
+
+        <section class="analysis-section insights-section" id="climate-insights" hidden>
+            <div class="insight-metrics-grid">
+                <article class="metric-card"><div class="metric-top"><span>INDIA MEAN TEMPERATURE</span><span>♨</span></div><h3 id="insight-temperature-average">-- °C</h3><p>Historical state-area weighted mean</p></article>
+                <article class="metric-card"><div class="metric-top"><span>MEAN ANNUAL RAINFALL</span><span>☂</span></div><h3 id="insight-precipitation-average">-- mm</h3><p>Available annual grid average</p></article>
+                <article class="metric-card"><div class="metric-top"><span>WARMEST YEAR</span><span>↑</span></div><h3 id="insight-warmest-year">--</h3><p id="insight-warmest-value">Annual mean temperature</p></article>
+                <article class="metric-card"><div class="metric-top"><span>DATA PERIOD</span><span>◷</span></div><h3>1991–2024</h3><p>Historical analysis window</p></article>
+            </div>
+            <div class="chart-card insight-chart-card">
+                <div class="chart-card-heading"><div><h3>Temperature vs Precipitation</h3><p>State-level climate relationship; each point represents one state or union territory.</p></div><span class="chart-unit">°C · mm/year</span></div>
+                <div id="climate-scatter-chart" class="insight-chart" role="img" aria-label="Scatter plot comparing average state temperature and annual rainfall"></div>
+                <p class="chart-footnote">Only regions with both valid temperature and rainfall averages are included.</p>
+            </div>
+        </section>
+
+        <section class="analysis-section methodology-section" id="methodology-section" hidden>
+            <div class="methodology-grid">
+                <article class="chart-card"><div class="chart-card-heading"><h3>Data Sources</h3></div><p>AtmosIQ uses processed historical gridded climate datasets for India, including annual precipitation and temperature records. State boundaries are supplied as GeoJSON.</p></article>
+                <article class="chart-card"><div class="chart-card-heading"><h3>Analysis Period</h3></div><p>The primary analysis period is 1991–2024. Charts use available observations within this period and retain gaps where source data is missing.</p></article>
+                <article class="chart-card"><div class="chart-card-heading"><h3>Spatial Aggregation</h3></div><p>State temperature statistics use area-weighted grid-cell averages. India-wide precipitation summaries use valid grid cells and account for spatial cell area.</p></article>
+                <article class="chart-card"><div class="chart-card-heading"><h3>Limitations</h3></div><p>Coverage varies by variable, state and year. Missing observations are not treated as zero or estimated. Results describe the supplied datasets and are not forecasts.</p></article>
+            </div>
+        </section>
+
+        <footer class="dashboard-footer">
+            AtmosIQ © 2026 · Historical Climate Analytics
+        </footer>
+
+    </main>
+
+</div>
+
+</body>
+</html>

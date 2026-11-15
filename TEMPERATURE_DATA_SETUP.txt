@@ -1,0 +1,57 @@
+ATMOSIQ TEMPERATURE DATA SETUP
+
+We are using the India Meteorological Department (IMD) daily gridded temperature archive.
+
+Official archive pages:
+Maximum temperature (1 degree x 1 degree):
+https://www.imdpune.gov.in/cmpg/Griddata/Max_1_Bin.html
+
+Minimum temperature (1 degree x 1 degree):
+https://www.imdpune.gov.in/cmpg/Griddata/Min_1_Bin.html
+
+The official IMD pages describe daily data from 1951-2024, on a 31 x 31 grid,
+with temperatures in degrees Celsius. The page notes that data from 2008 onward
+are based on a smaller number of stations (around 180).
+
+AtmosIQ will use 1991-2024 so the temperature period matches the current rainfall
+analysis. Temperature grid resolution is 1 degree, while the rainfall data already
+in this project is 0.25 degree. These resolutions must be documented and should
+not be treated as identical spatial grids.
+
+EASIEST DOWNLOAD METHOD (Windows / VS Code)
+
+1. Open the AtmosIQ project folder in VS Code.
+2. Open Terminal > New Terminal.
+3. Install the downloader package:
+       py -m pip install imdlib
+4. Run the download script:
+       py backend\download_temperature.py
+5. Leave the terminal open until it reports that the download step finished.
+
+Expected raw files:
+    data/temperature/raw/tmax/1991.grd ... 2024.grd
+    data/temperature/raw/tmin/1991.grd ... 2024.grd
+
+That is 34 yearly files for each variable (68 files total). The script can be run
+again if a download is interrupted. Keep the original .grd files unchanged.
+
+IMPORTANT VARIABLE NOTE
+
+The IMD archive pages provide daily maximum temperature (tmax) and daily minimum
+temperature (tmin). They do not describe a separate daily mean temperature (tas)
+archive on these pages.
+
+If AtmosIQ needs a mean-temperature series from these two variables, we can derive
+the daily midpoint as (tmax + tmin) / 2 and label it explicitly as a derived
+midpoint estimate. It must not be presented as an observed IMD tas variable.
+
+After the download, the files need validation and processing before the dashboard
+charts are activated. Do not create or fill the processed CSV manually.
+
+Data source and documentation:
+IMD maximum-temperature archive:
+https://www.imdpune.gov.in/cmpg/Griddata/Max_1_Bin.html
+IMD minimum-temperature archive:
+https://www.imdpune.gov.in/cmpg/Griddata/Min_1_Bin.html
+IMDLIB downloader documentation:
+https://imdlib.readthedocs.io/en/stable/Usage.html

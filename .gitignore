@@ -1,0 +1,5 @@
+*.nc
+.env
+__pycache__/
+.venv/
+venv/
